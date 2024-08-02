@@ -49,7 +49,7 @@ exports.todoList = async (req, res) => {
                 .skip(startIndex)
                 .limit(perPageRecordInt);
         } else {
-            todos = await Todo.find().sort({ createdAt: -1 });
+            todos = await Todo.find({ createdBy: userId }).sort({ createdAt: -1 });
             total = todos.length;
         }
 
@@ -175,41 +175,270 @@ exports.downloadTodosAsCSV = async (req, res) => {
 };
 
 // filter todo
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+//         const status = req.query.status;
+//         const page = parseInt(req.query.page) || 1;
+//         const per_page_record = parseInt(req.query.per_page_record) || 10;
+
+//         let todos;
+//         let total;
+//         const query = {};
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         const pageInt = parseInt(page);
+//         const perPageRecordInt = parseInt(per_page_record);
+//         const startIndex = (pageInt - 1) * perPageRecordInt;
+//         total = await Todo.countDocuments(query).where({ createdBy: userId });
+//         todos = await Todo.find(query).where({ createdBy: userId })
+//             .sort({ createdAt: -1 })
+//             .skip(startIndex)
+//             .limit(perPageRecordInt);
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             total: total,
+//             success: true,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+//         const status = req.query.status;
+//         const page = parseInt(req.query.page) || 1;
+//         const per_page_record = parseInt(req.query.per_page_record) || 10;
+
+//         let todos;
+//         let total;
+//         const query = { createdBy: userId };
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         const startIndex = (page - 1) * per_page_record;
+//         total = await Todo.countDocuments(query);
+//         todos = await Todo.find(query)
+//             .sort({ createdAt: -1 })
+//             .skip(startIndex)
+//             .limit(per_page_record);
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             total: total,
+//             success: true,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+//         const status = req.query.status;
+//         const page = parseInt(req.query.page) || 1;
+//         const perPageRecord = parseInt(req.query.per_page_record) || 10;
+
+//         // Validate ObjectId
+//         if (!mongoose.Types.ObjectId.isValid(userId)) {
+//             return res.status(400).json({ error: 'Invalid user ID' });
+//         }
+
+//         let query = { createdBy: userId };
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         console.log('Query:', query);
+
+//         const startIndex = (page - 1) * perPageRecord;
+//         const total = await Todo.countDocuments(query);
+//         const todos = await Todo.find(query)
+//             .sort({ createdAt: -1 })
+//             .skip(startIndex)
+//             .limit(perPageRecord);
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             total: total,
+//             success: true,
+//         });
+//     } catch (error) {
+//         console.error('Error fetching todos:', error);
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+
+
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         const status = req.query.status; // Get the status from query parameters
+
+//         // Validate the status parameter
+//         if (!['pending', 'completed'].includes(status)) {
+//             return res.status(400).json({ message: 'Invalid status value' });
+//         }
+
+//         // Query the database
+//         const todos = await Todo.find({ status: status });
+
+//         // Send the response
+//         res.status(200).json(todos);
+//     } catch (error) {
+//         res.status(500).json({ message: 'Server error', error });
+//     }
+// }
+
+// write a function to filter todos based on status
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+//         const status = req.query.status;
+//         const page = parseInt(req.query.page) || 1;
+//         const perPageRecord = parseInt(req.query.per_page_record) || 10;
+
+//         // Validate ObjectId
+//         if (!mongoose.Types.ObjectId.isValid(userId)) {
+//             return res.status(400).json({ error: 'Invalid user ID' });
+//         }
+
+//         let query = { createdBy: userId };
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         const startIndex = (page - 1) * perPageRecord;
+//         const total = await Todo.countDocuments(query);
+//         const todos = await Todo.find(query)
+//             .sort({ createdAt: -1 })
+//             .skip(startIndex)
+//             .limit(perPageRecord);
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             total: total,
+//             success: true,
+//         });
+//     } catch (error) {
+//         console.error('Error fetching todos:', error);
+//         return res.status(500).json({ error: error.message });
+
+//     }
+// }
+
+// exports.filterTodos = async (req, res) => {
+//     try {
+//         // const userId = req.user.id;
+//         const status = req.query.status;
+//         const page = parseInt(req.query.page) || 1;
+//         const per_page_record = parseInt(req.query.per_page_record) || 10;
+
+//         if (isNaN(page) || isNaN(per_page_record)) {
+//             return res.status(400).json({ error: "Invalid pagination parameters" });
+//         }
+
+//         let todos;
+//         let total;
+//         const query = {};
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         const pageInt = parseInt(page);
+//         const perPageRecordInt = parseInt(per_page_record);
+//         const startIndex = (pageInt - 1) * perPageRecordInt;
+//         total = await Todo.countDocuments(query).where({ createdBy: userId });
+//         todos = await Todo.find(query).where({ createdBy: userId })
+//             .sort({ createdAt: -1 })
+//             .skip(startIndex)
+//             .limit(perPageRecordInt);
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             total: total,
+//             success: true,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+
+// exports.filterTodos = async (req, res) => {
+//     try {
+       
+//         const status = req.query.status;
+
+//         let todos;
+       
+
+//         if (status) {
+//             query.status = status;
+//         }
+
+//         todos = await Todo.find(query).sort({ createdAt: -1 });
+
+//         const todosWithCounts = todos.map(todo => ({
+//             ...todo._doc
+//         }));
+
+//         return res.json({
+//             message: "Filtered todo list retrieved successfully",
+//             data: todosWithCounts,
+//             success: true,
+//         });
+//     } catch (error) {
+//         return res.status(500).json({ error: error.message });
+//     }
+// }
+
 exports.filterTodos = async (req, res) => {
     try {
-        const userId = req.user.id;
         const status = req.query.status;
-        const page = parseInt(req.query.page) || 1;
-        const per_page_record = parseInt(req.query.per_page_record) || 10;
 
-        let todos;
-        let total;
-        const query = {};
-
-        if (status) {
-            query.status = status;
+        if (!['pending', 'completed'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status value' });
         }
 
-        const pageInt = parseInt(page);
-        const perPageRecordInt = parseInt(per_page_record);
-        const startIndex = (pageInt - 1) * perPageRecordInt;
-        total = await Todo.countDocuments(query);
-        todos = await Todo.find(query)
-            .sort({ createdAt: -1 })
-            .skip(startIndex)
-            .limit(perPageRecordInt);
-
-        const todosWithCounts = todos.map(todo => ({
-            ...todo._doc
-        }));
-
-        return res.json({
-            message: "Filtered todo list retrieved successfully",
-            data: todosWithCounts,
-            total: total,
-            success: true,
-        });
+        const todos = await Todo.find({ status: status });
+        res.status(200).json(todos);
     } catch (error) {
-        return res.status(500).json({ error: error.message });
+        res.status(500).json({ message: 'Server error', error });
     }
 }
