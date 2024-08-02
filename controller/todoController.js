@@ -20,7 +20,6 @@ exports.addTodo = async (req, res) => {
         const todo = new Todo({
             description,
             status,
-            createdBy: req.user.id
         });
 
         await todo.save();
@@ -33,7 +32,7 @@ exports.addTodo = async (req, res) => {
 // todo list
 exports.todoList = async (req, res) => {
     try {
-        const userId = req.user.id;
+        
         const page = parseInt(req.query.page);
         const per_page_record = parseInt(req.query.per_page_record);
 
@@ -44,13 +43,13 @@ exports.todoList = async (req, res) => {
             const pageInt = parseInt(page);
             const perPageRecordInt = parseInt(per_page_record);
             const startIndex = (pageInt - 1) * perPageRecordInt;
-            total = await Todo.countDocuments({ createdBy: userId });;
-            todos = await Todo.find({ createdBy: userId })
+            total = await Todo.countDocuments();;
+            todos = await Todo.find()
                 .sort({ createdAt: -1 })
                 .skip(startIndex)
                 .limit(perPageRecordInt);
         } else {
-            todos = await Todo.find({ createdBy: userId }).sort({ createdAt: -1 });
+            todos = await Todo.find().sort({ createdAt: -1 });
             total = todos.length;
         }
 
