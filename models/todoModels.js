@@ -14,11 +14,6 @@ const todoSchema = new mongoose.Schema({
         default: 'pending',
         enum: ['pending', 'completed'],
     },
-    createdBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User', 
-        required: true,
-    },
 
    
 }, { timestamps: true });
